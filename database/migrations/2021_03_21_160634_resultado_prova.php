@@ -17,8 +17,8 @@ class ResultadoProva extends Migration
             $table->increments('id');
             $table->integer('corredor_id');
             $table->integer('prova_id');
-            $table->date('data_inicio');
-            $table->date('data_fim');
+            $table->time('hora_inicio');
+            $table->time('hora_fim');
             $table->timestamp('created_at')->nullable();
         });
     }
