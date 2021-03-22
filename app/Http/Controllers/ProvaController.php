@@ -4,82 +4,46 @@ namespace App\Http\Controllers;
 
 use App\Models\Prova;
 use Illuminate\Http\Request;
+use App\Services\ValidationService;
 
 class ProvaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        return Prova::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $validator = new ValidationService(Prova::rules(), $request->all());
+        $errors = $validator->make();
+
+        if ($errors) {
+            return response()->json(['message' => $errors->messages()->all()], 500);
+        }
+        
+        $prova = Prova::create($request->all());
+        return response()->json(['data' => $prova]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Prova  $prova
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Prova $prova)
+
+    public function show($prova)
     {
-        //
+        return Prova::findOrFail($prova);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Prova  $prova
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Prova $prova)
+
+    public function update(Request $request, $prova)
     {
-        //
+        $prova = Prova::findOrFail($prova);
+        $prova->update($request->all());
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Prova  $prova
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Prova $prova)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Prova  $prova
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Prova $prova)
+    public function destroy($prova)
     {
-        //
+        $prova = Prova::findOrFail($prova);
+        return $prova->delete();
     }
 }

@@ -17,7 +17,7 @@ class Prova extends Migration
             $table->increments('id');
             $table->integer('tipo_prova');
             $table->date('data');
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
         });
     }
 

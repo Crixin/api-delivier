@@ -15,9 +15,9 @@ class CorredorProva extends Migration
     {
         Schema::create('corredor_prova', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('corredor_id')->refe;
-            $table->integer('prova_id');
-            $table->timestamp('created_at')->nullable();
+            $table->foreignId('corredor_id')->constrained('corredor');
+            $table->foreignId('prova_id')->constrained('prova');
+            $table->timestamps();
         });
     }
 

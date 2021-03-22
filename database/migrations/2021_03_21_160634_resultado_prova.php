@@ -15,11 +15,10 @@ class ResultadoProva extends Migration
     {
         Schema::create('resultado_prova', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('corredor_id');
-            $table->integer('prova_id');
+            $table->foreignId('corredor_prova_id')->constrained('corredor_prova');
             $table->time('hora_inicio');
             $table->time('hora_fim');
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
         });
     }
 

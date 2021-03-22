@@ -16,8 +16,9 @@ class Corredor extends Migration
         Schema::create('corredor', function (Blueprint $table) {
             $table->increments('id');
             $table->text('nome');
+            $table->text('cpf');
             $table->date('data_nascimento');
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
         });
     }
 

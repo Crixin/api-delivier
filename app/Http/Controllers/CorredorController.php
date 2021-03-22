@@ -4,82 +4,46 @@ namespace App\Http\Controllers;
 
 use App\Models\Corredor;
 use Illuminate\Http\Request;
+use App\Services\ValidationService;
 
 class CorredorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        return Corredor::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $validator = new ValidationService(Corredor::rules(), $request->all());
+        $errors = $validator->make();
+
+        if ($errors) {
+            return response()->json(['message' => $errors->messages()->all()], 500);
+        }
+        
+        $corredor = Corredor::create($request->all());
+        return response()->json(['data' => $corredor]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Corredor  $corredor
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Corredor $corredor)
+
+    public function show($corredor)
     {
-        //
+        return Corredor::findOrFail($corredor);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Corredor  $corredor
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Corredor $corredor)
+
+    public function update(Request $request, $corredor)
     {
-        //
+        $corredor = Corredor::findOrFail($corredor);
+        $corredor->update($request->all());
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Corredor  $corredor
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Corredor $corredor)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Corredor  $corredor
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Corredor $corredor)
+    public function destroy($corredor)
     {
-        //
+        $corredor = Corredor::findOrFail($corredor);
+        return $corredor->delete();
     }
 }

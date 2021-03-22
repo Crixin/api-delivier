@@ -2,84 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CorredorProva;
+use App\Models\{CorredorProva, Prova};
 use Illuminate\Http\Request;
+use App\Services\ValidationService;
 
 class CorredorProvaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        return CorredorProva::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        try {
+            $validator = new ValidationService(CorredorProva::rules(), $request->all());
+            $errors = $validator->make();
+
+            if ($errors) {
+                throw new \Exception($errors->messages()->all());
+            }
+
+            $provasCadastradasCorredor = CorredorProva::where([
+                ["corredor_id", "=", $request->corredor_id],
+            ])->pluck('prova_id')->toArray();
+            
+            $provaNova = Prova::findOrFail($request->prova_id);
+
+            $datasProvasParticipantes = Prova::whereIn("id", $provasCadastradasCorredor)->pluck('data')->toArray();
+            
+            if (in_array($provaNova->data, $datasProvasParticipantes)) {
+                throw new \Exception("O corredor não pode ter duas corridas no mesmo dia.");
+            }
+            
+            $corredorProva = CorredorProva::create($request->all());
+            return response()->json(['data' => $corredorProva]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CorredorProva  $corredorProva
-     * @return \Illuminate\Http\Response
-     */
-    public function show(CorredorProva $corredorProva)
+
+    public function show($corredorProva)
     {
-        //
+        return CorredorProva::findOrFail($corredorProva);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CorredorProva  $corredorProva
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CorredorProva $corredorProva)
+
+    public function update(Request $request, $corredorProva)
     {
-        //
+        $corredorProva = CorredorProva::findOrFail($corredorProva);
+        $corredorProva->update($request->all());
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CorredorProva  $corredorProva
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, CorredorProva $corredorProva)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CorredorProva  $corredorProva
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(CorredorProva $corredorProva)
+    public function destroy($corredorProva)
     {
-        //
+        $corredorProva = CorredorProva::findOrFail($corredorProva);
+        return $corredorProva->delete();
     }
 }
