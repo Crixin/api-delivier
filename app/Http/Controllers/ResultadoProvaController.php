@@ -9,12 +9,22 @@ use App\Services\ValidationService;
 
 class ResultadoProvaController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        return ResultadoProva::all();
+        return ResultadoProva::orderBy('id')->get();
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         try {
@@ -48,23 +58,32 @@ class ResultadoProvaController extends Controller
         }
     }
 
-
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function show($resultadoProva)
     {
         return ResultadoProva::findOrFail($resultadoProva);
     }
 
-
-    public function update(Request $request, $resultadoProva)
-    {
-        $resultadoProva = ResultadoProva::findOrFail($resultadoProva);
-        $resultadoProva->update($request->all());
-    }
-
-
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($resultadoProva)
     {
-        $resultadoProva = ResultadoProva::findOrFail($resultadoProva);
-        return $resultadoProva->delete();
+        try {
+            $resultadoProva = ResultadoProva::findOrFail($resultadoProva);
+            $resultadoProva->delete();
+
+            return response()->json(['data' => $resultadoProva]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 }

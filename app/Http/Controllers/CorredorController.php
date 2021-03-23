@@ -8,42 +8,89 @@ use App\Services\ValidationService;
 
 class CorredorController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        return Corredor::all();
+        return Corredor::orderBy('id')->get();
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
-        $validator = new ValidationService(Corredor::rules(), $request->all());
-        $errors = $validator->make();
+        try {
+            $validator = new ValidationService(Corredor::rules(), $request->all());
+            $errors = $validator->make();
 
-        if ($errors) {
-            return response()->json(['message' => $errors->messages()->all()], 500);
+            if ($errors) {
+                throw new \Exception($errors->messages()->all());
+            }
+            
+            $corredor = Corredor::create($request->all());
+            
+            return response()->json(['data' => $corredor]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
         }
-        
-        $corredor = Corredor::create($request->all());
-        return response()->json(['data' => $corredor]);
     }
 
-
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function show($corredor)
     {
-        return Corredor::findOrFail($corredor);
+        try {
+            return response()->json(['data' => Corredor::findOrFail($corredor)]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 
-
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $corredor)
     {
-        $corredor = Corredor::findOrFail($corredor);
-        $corredor->update($request->all());
+        try {
+            $corredor = Corredor::findOrFail($corredor);
+            $corredor->update($request->all());
+
+            return response()->json(['data' => $corredor]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 
-
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($corredor)
     {
-        $corredor = Corredor::findOrFail($corredor);
-        return $corredor->delete();
+        try {
+            $corredor = Corredor::findOrFail($corredor);
+            $corredor->delete();
+
+            return response()->json(['data' => $corredor]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 }

@@ -8,12 +8,22 @@ use App\Services\ValidationService;
 
 class CorredorProvaController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        return CorredorProva::all();
+        return CorredorProva::orderBy('id')->get();
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         try {
@@ -43,23 +53,37 @@ class CorredorProvaController extends Controller
         }
     }
 
-
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function show($corredorProva)
     {
-        return CorredorProva::findOrFail($corredorProva);
+        try {
+            return response()->json(['data' => CorredorProva::findOrFail($corredorProva)]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 
-
-    public function update(Request $request, $corredorProva)
-    {
-        $corredorProva = CorredorProva::findOrFail($corredorProva);
-        $corredorProva->update($request->all());
-    }
-
-
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($corredorProva)
     {
-        $corredorProva = CorredorProva::findOrFail($corredorProva);
-        return $corredorProva->delete();
+        try {
+            $corredorProva = CorredorProva::findOrFail($corredorProva);
+            $corredorProva->delete();
+
+            return response()->json(['data' => $corredorProva]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 }

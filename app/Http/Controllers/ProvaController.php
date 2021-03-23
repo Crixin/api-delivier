@@ -8,42 +8,91 @@ use App\Services\ValidationService;
 
 class ProvaController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        return Prova::all();
+        return Prova::orderBy('id')->get();
     }
 
-
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
-        $validator = new ValidationService(Prova::rules(), $request->all());
-        $errors = $validator->make();
+        try {
+            $validator = new ValidationService(Prova::rules(), $request->all());
+            $errors = $validator->make();
 
-        if ($errors) {
-            return response()->json(['message' => $errors->messages()->all()], 500);
+            if ($errors) {
+                throw new \Exception($errors->messages()->all());
+            }
+            
+            $prova = Prova::create($request->all());
+            
+            return response()->json(['data' => $prova]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
         }
-        
-        $prova = Prova::create($request->all());
-        return response()->json(['data' => $prova]);
     }
 
-
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function show($prova)
     {
-        return Prova::findOrFail($prova);
+        try {
+            return response()->json(['data' => Prova::findOrFail($prova)]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 
-
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $prova)
     {
-        $prova = Prova::findOrFail($prova);
-        $prova->update($request->all());
+        try {
+            $prova = Prova::findOrFail($prova);
+            $data = $request->all();
+            unset($data['data']);
+            $prova->update($data);
+
+            return response()->json(['data' => $prova]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 
-
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($prova)
     {
-        $prova = Prova::findOrFail($prova);
-        return $prova->delete();
+        try {
+            $prova = Prova::findOrFail($prova);
+            $prova->delete();
+
+            return response()->json(['data' => $prova]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 }
